@@ -44,7 +44,7 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
     List<Warehouse> warehousesAtLocation =
         warehouseStore.getAll().stream()
             .filter(w -> newWarehouse.location.equals(w.location))
-            .filter(w -> !w.businessUnitCode.equals(existing.businessUnitCode))
+            .filter(w -> !w.businessUnitCode.equals(existing.businessUnitCode)) // exclude the existing warehouse so that we don't count it twice
             .toList();
 
     if (warehousesAtLocation.size() >= location.maxNumberOfWarehouses) {
