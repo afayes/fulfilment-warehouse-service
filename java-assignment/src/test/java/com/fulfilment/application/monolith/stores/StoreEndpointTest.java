@@ -10,7 +10,7 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
-public class StoreResourceTest {
+public class StoreEndpointTest {
 
   private static final String PATH = "store";
 
