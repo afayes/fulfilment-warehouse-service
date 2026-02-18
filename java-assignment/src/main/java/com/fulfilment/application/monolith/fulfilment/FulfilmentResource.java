@@ -12,12 +12,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 @Path("fulfilment")
 @ApplicationScoped
 @Produces("application/json")
 @Consumes("application/json")
 public class FulfilmentResource {
+
+  private static final Logger LOGGER = Logger.getLogger(FulfilmentResource.class);
 
   @Inject FulfilmentService fulfilmentService;
 
@@ -32,6 +35,7 @@ public class FulfilmentResource {
     try {
       return fulfilmentService.getByStoreId(storeId);
     } catch (FulfilmentNotFoundException e) {
+      LOGGER.warnf("Store not found for fulfilment lookup: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 404);
     }
   }
@@ -46,9 +50,13 @@ public class FulfilmentResource {
     try {
       fulfilmentService.create(fulfilment);
     } catch (FulfilmentValidationException e) {
+      LOGGER.warnf("Fulfilment creation failed: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 400);
     }
 
+    LOGGER.infof(
+        "Fulfilment created: store=%d, product=%d, warehouse=%s",
+        fulfilment.storeId, fulfilment.productId, fulfilment.warehouseBusinessUnitCode);
     return Response.ok(fulfilment).status(201).build();
   }
 
@@ -59,8 +67,10 @@ public class FulfilmentResource {
     try {
       fulfilmentService.delete(id);
     } catch (FulfilmentNotFoundException e) {
+      LOGGER.warnf("Fulfilment deletion failed: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 404);
     }
+    LOGGER.infof("Fulfilment deleted: id=%d", id);
     return Response.status(204).build();
   }
 }

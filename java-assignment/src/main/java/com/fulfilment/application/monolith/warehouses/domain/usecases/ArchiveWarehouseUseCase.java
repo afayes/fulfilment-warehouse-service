@@ -6,9 +6,12 @@ import com.fulfilment.application.monolith.warehouses.domain.ports.ArchiveWareho
 import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class ArchiveWarehouseUseCase implements ArchiveWarehouseOperation {
+
+  private static final Logger LOGGER = Logger.getLogger(ArchiveWarehouseUseCase.class);
 
   private final WarehouseStore warehouseStore;
 
@@ -25,5 +28,6 @@ public class ArchiveWarehouseUseCase implements ArchiveWarehouseOperation {
 
     existing.archivedAt = LocalDateTime.now();
     warehouseStore.update(existing);
+    LOGGER.infof("Warehouse archived: %s", warehouse.businessUnitCode);
   }
 }

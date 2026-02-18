@@ -10,9 +10,12 @@ import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStor
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
+
+  private static final Logger LOGGER = Logger.getLogger(ReplaceWarehouseUseCase.class);
 
   private final WarehouseStore warehouseStore;
   private final LocationResolver locationResolver;
@@ -65,5 +68,8 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
 
     newWarehouse.createdAt = LocalDateTime.now();
     warehouseStore.create(newWarehouse);
+    LOGGER.infof(
+        "Warehouse replaced: code=%s, oldLocation=%s, newLocation=%s",
+        newWarehouse.businessUnitCode, existing.location, newWarehouse.location);
   }
 }

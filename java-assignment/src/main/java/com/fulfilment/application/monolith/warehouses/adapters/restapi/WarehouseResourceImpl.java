@@ -15,9 +15,12 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 @RequestScoped
 public class WarehouseResourceImpl implements WarehouseResource {
+
+  private static final Logger LOGGER = Logger.getLogger(WarehouseResourceImpl.class);
 
   @Inject private WarehouseRepository warehouseRepository;
 
@@ -40,8 +43,10 @@ public class WarehouseResourceImpl implements WarehouseResource {
     try {
       createWarehouseOperation.create(warehouse);
     } catch (WarehouseValidationException | LocationNotFoundException e) {
+      LOGGER.warnf("Warehouse creation failed: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 400);
     }
+    LOGGER.infof("Warehouse created: %s", warehouse.businessUnitCode);
     return toWarehouseResponse(warehouse);
   }
 
@@ -58,8 +63,10 @@ public class WarehouseResourceImpl implements WarehouseResource {
     try {
       archiveWarehouseOperation.archive(warehouse);
     } catch (WarehouseNotFoundException e) {
+      LOGGER.warnf("Warehouse archive failed: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 404);
     }
+    LOGGER.infof("Warehouse archived: %s", id);
   }
 
   @Override
@@ -71,16 +78,20 @@ public class WarehouseResourceImpl implements WarehouseResource {
     try {
       replaceWarehouseOperation.replace(newWarehouse);
     } catch (WarehouseNotFoundException e) {
+      LOGGER.warnf("Warehouse replacement failed: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 404);
     } catch (WarehouseValidationException | LocationNotFoundException e) {
+      LOGGER.warnf("Warehouse replacement failed: %s", e.getMessage());
       throw new WebApplicationException(e.getMessage(), 400);
     }
+    LOGGER.infof("Warehouse replaced: %s", businessUnitCode);
     return toWarehouseResponse(newWarehouse);
   }
 
   private Warehouse findWarehouseByIdentifier(String id) {
     Warehouse warehouse = warehouseRepository.findByBusinessUnitCode(id);
     if (warehouse == null) {
+      LOGGER.warnf("Warehouse not found: %s", id);
       throw new WebApplicationException("Warehouse with identifier '" + id + "' not found", 404);
     }
     return warehouse;

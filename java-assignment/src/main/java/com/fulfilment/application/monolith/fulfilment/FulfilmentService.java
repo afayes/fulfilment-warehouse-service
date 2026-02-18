@@ -6,9 +6,12 @@ import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStor
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class FulfilmentService {
+
+  private static final Logger LOGGER = Logger.getLogger(FulfilmentService.class);
 
   static final int MAX_WAREHOUSES_PER_PRODUCT_PER_STORE = 2;
   static final int MAX_WAREHOUSES_PER_STORE = 3;
@@ -35,6 +38,9 @@ public class FulfilmentService {
   public Fulfilment create(Fulfilment fulfilment) {
     validate(fulfilment);
     fulfilmentRepository.persist(fulfilment);
+    LOGGER.infof(
+        "Fulfilment created: store=%d, product=%d, warehouse=%s",
+        fulfilment.storeId, fulfilment.productId, fulfilment.warehouseBusinessUnitCode);
     return fulfilment;
   }
 
@@ -44,6 +50,7 @@ public class FulfilmentService {
       throw new FulfilmentNotFoundException("Fulfilment with id " + id + " does not exist");
     }
     fulfilmentRepository.delete(entity);
+    LOGGER.infof("Fulfilment deleted: id=%d", id);
   }
 
   void validate(Fulfilment fulfilment) {
