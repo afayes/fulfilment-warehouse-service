@@ -185,8 +185,6 @@ class FulfilmentResourceTest {
     Long p4 = createProduct("FULTEST-P4");
     Long p5 = createProduct("FULTEST-P5");
     Long p6 = createProduct("FULTEST-P6");
-    Long p7 = createProduct("FULTEST-P7");
-    Long p8 = createProduct("FULTEST-P8");
 
     int id1 = createFulfilment(1, 1, "MWH.012");
     int id2 = createFulfilment(1, 2, "MWH.012");
@@ -210,8 +208,6 @@ class FulfilmentResourceTest {
     deleteProduct(p4);
     deleteProduct(p5);
     deleteProduct(p6);
-    deleteProduct(p7);
-    deleteProduct(p8);
   }
 
   @Test

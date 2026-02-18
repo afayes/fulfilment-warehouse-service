@@ -31,7 +31,7 @@ public class FulfilmentResource {
   public List<Fulfilment> getByStore(Long storeId) {
     try {
       return fulfilmentService.getByStoreId(storeId);
-    } catch (FulfilmentValidationException e) {
+    } catch (FulfilmentNotFoundException e) {
       throw new WebApplicationException(e.getMessage(), 404);
     }
   }
@@ -58,7 +58,7 @@ public class FulfilmentResource {
   public Response delete(Long id) {
     try {
       fulfilmentService.delete(id);
-    } catch (FulfilmentValidationException e) {
+    } catch (FulfilmentNotFoundException e) {
       throw new WebApplicationException(e.getMessage(), 404);
     }
     return Response.status(204).build();

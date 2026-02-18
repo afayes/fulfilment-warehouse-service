@@ -26,7 +26,7 @@ public class FulfilmentService {
 
   public List<Fulfilment> getByStoreId(Long storeId) {
     if (Store.findById(storeId) == null) {
-      throw new FulfilmentValidationException(
+      throw new FulfilmentNotFoundException(
           "Store with id " + storeId + " does not exist");
     }
     return fulfilmentRepository.findByStoreId(storeId);
@@ -41,7 +41,7 @@ public class FulfilmentService {
   public void delete(Long id) {
     Fulfilment entity = fulfilmentRepository.findById(id);
     if (entity == null) {
-      throw new FulfilmentValidationException("Fulfilment with id " + id + " does not exist");
+      throw new FulfilmentNotFoundException("Fulfilment with id " + id + " does not exist");
     }
     fulfilmentRepository.delete(entity);
   }
