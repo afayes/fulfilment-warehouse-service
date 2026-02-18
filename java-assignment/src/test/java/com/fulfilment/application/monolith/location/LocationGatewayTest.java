@@ -13,7 +13,7 @@ public class LocationGatewayTest {
   private final LocationGateway locationGateway = new LocationGateway();
 
   @Test
-  void testResolveByIdentifierWhenExistingLocationThenReturnLocation() {
+  void resolveByIdentifier_shouldReturnLocation_whenLocationExists() {
     // when
     Location location = locationGateway.resolveByIdentifier("ZWOLLE-001");
 
@@ -25,7 +25,7 @@ public class LocationGatewayTest {
   }
 
   @Test
-  void testResolveByIdentifierWhenNonExistingLocationThenThrowLocationNotFoundException() {
+  void resolveByIdentifier_shouldThrowLocationNotFoundException_whenLocationDoesNotExist() {
     LocationNotFoundException exception =
         assertThrows(
             LocationNotFoundException.class,
@@ -35,7 +35,7 @@ public class LocationGatewayTest {
   }
 
   @Test
-  void testResolveByIdentifierWhenNullIdentifierThenThrowIllegalArgumentException() {
+  void resolveByIdentifier_shouldThrowIllegalArgumentException_whenIdentifierIsNull() {
     IllegalArgumentException exception =
         assertThrows(
             IllegalArgumentException.class, () -> locationGateway.resolveByIdentifier(null));
@@ -44,7 +44,7 @@ public class LocationGatewayTest {
   }
 
   @Test
-  void testResolveByIdentifierWhenEmptyIdentifierThenThrowIllegalArgumentException() {
+  void resolveByIdentifier_shouldThrowIllegalArgumentException_whenIdentifierIsEmpty() {
     IllegalArgumentException exception =
         assertThrows(
             IllegalArgumentException.class, () -> locationGateway.resolveByIdentifier(""));
@@ -53,7 +53,7 @@ public class LocationGatewayTest {
   }
 
   @Test
-  void testResolveByIdentifierWhenBlankIdentifierThenThrowIllegalArgumentException() {
+  void resolveByIdentifier_shouldThrowIllegalArgumentException_whenIdentifierIsBlank() {
     IllegalArgumentException exception =
         assertThrows(
             IllegalArgumentException.class, () -> locationGateway.resolveByIdentifier("   "));
