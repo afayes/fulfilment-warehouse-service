@@ -30,7 +30,7 @@ class FulfilmentResourceTest {
             .extract()
             .path("id");
 
-    given().when().delete(PATH + "/" + id).then().statusCode(204);
+    deleteFulfilment(id);
   }
 
   @Test
@@ -82,7 +82,7 @@ class FulfilmentResourceTest {
         .then()
         .statusCode(400);
 
-    given().when().delete(PATH + "/" + id).then().statusCode(204);
+    deleteFulfilment(id);
   }
 
   @Test
@@ -115,8 +115,8 @@ class FulfilmentResourceTest {
         .then()
         .statusCode(400);
 
-    given().when().delete(PATH + "/" + id1).then().statusCode(204);
-    given().when().delete(PATH + "/" + id2).then().statusCode(204);
+    deleteFulfilment(id1);
+    deleteFulfilment(id2);
   }
 
   @Test
@@ -173,9 +173,9 @@ class FulfilmentResourceTest {
         .then()
         .statusCode(400);
 
-    given().when().delete(PATH + "/" + id1).then().statusCode(204);
-    given().when().delete(PATH + "/" + id2).then().statusCode(204);
-    given().when().delete(PATH + "/" + id3).then().statusCode(204);
+    deleteFulfilment(id1);
+    deleteFulfilment(id2);
+    deleteFulfilment(id3);
   }
 
   @Test
@@ -200,11 +200,11 @@ class FulfilmentResourceTest {
         .then()
         .statusCode(400);
 
-    given().when().delete(PATH + "/" + id1).then().statusCode(204);
-    given().when().delete(PATH + "/" + id2).then().statusCode(204);
-    given().when().delete(PATH + "/" + id3).then().statusCode(204);
-    given().when().delete(PATH + "/" + id4).then().statusCode(204);
-    given().when().delete(PATH + "/" + id5).then().statusCode(204);
+    deleteFulfilment(id1);
+    deleteFulfilment(id2);
+    deleteFulfilment(id3);
+    deleteFulfilment(id4);
+    deleteFulfilment(id5);
     deleteProduct(p4);
     deleteProduct(p5);
     deleteProduct(p6);
@@ -229,7 +229,7 @@ class FulfilmentResourceTest {
         .statusCode(200)
         .body("size()", greaterThanOrEqualTo(1));
 
-    given().when().delete(PATH + "/" + id).then().statusCode(204);
+    deleteFulfilment(id);
   }
 
   @Test
@@ -240,6 +240,10 @@ class FulfilmentResourceTest {
   @Test
   void delete_shouldReturn404_whenFulfilmentDoesNotExist() {
     given().when().delete(PATH + "/9999").then().statusCode(404);
+  }
+
+  private void deleteFulfilment(int id) {
+    given().when().delete(PATH + "/" + id).then().statusCode(204);
   }
 
   private int createFulfilment(long storeId, long productId, String warehouseCode) {
