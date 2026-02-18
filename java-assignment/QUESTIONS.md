@@ -70,11 +70,11 @@ Priority 3 — Smoke tests (thin top, @QuarkusIntegrationTest):
 A small number of end-to-end tests against the packaged application to verify it starts correctly and core flows work. These catch packaging, configuration, and runtime issues that @QuarkusTest misses. Keep these minimal — they are slow and brittle. Examples: WarehouseEndpointIT with a few key happy-path scenarios.
 
 Keeping coverage effective over time:
+- Enforce a minimum code coverage threshold (e.g. 80% line coverage) via a build plugin like JaCoCo, configured to fail the build if coverage drops below the threshold. This acts as a safety net — it doesn't guarantee good tests, but it prevents large untested areas from creeping in. Focus the threshold on business logic packages rather than generated code or simple DTOs.
 - Run tests in CI on every push — fast unit tests gate merges, slower integration tests run in parallel.
 - Follow consistent naming conventions (e.g. methodName_shouldExpectedBehaviour_whenCondition) so test intent is immediately clear.
 - Treat test code with the same quality standards as production code: use helper methods to reduce duplication, clean up test data, and keep tests independent.
 - When fixing a bug, always add a regression test first (as I did with the StoreResource.patch() fix) — this prevents the same defect from recurring and naturally grows coverage over time.
-- Enforce a minimum code coverage threshold (e.g. 80% line coverage) via a build plugin like JaCoCo, configured to fail the build if coverage drops below the threshold. This acts as a safety net — it doesn't guarantee good tests, but it prevents large untested areas from creeping in. Focus the threshold on business logic packages rather than generated code or simple DTOs.
 ```
 
 ----
