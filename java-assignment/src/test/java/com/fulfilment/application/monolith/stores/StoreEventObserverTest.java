@@ -1,13 +1,13 @@
 package com.fulfilment.application.monolith.stores;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.containsString;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 @QuarkusTest
 public class StoreEventObserverTest {
@@ -33,6 +33,7 @@ public class StoreEventObserverTest {
   @Test
   void update_shouldCallLegacyGateway_afterStoreIsUpdated() {
     int id = createStore("LEGACY-UPDATE-BEFORE", 10);
+    Mockito.reset(legacyStoreManagerGateway); // reset the mock after creating the store
 
     given()
         .contentType(ContentType.JSON)
@@ -48,6 +49,7 @@ public class StoreEventObserverTest {
   @Test
   void patch_shouldCallLegacyGateway_afterStoreIsPatched() {
     int id = createStore("LEGACY-PATCH-BEFORE", 10);
+    Mockito.reset(legacyStoreManagerGateway); // reset the mock after creating the store
 
     given()
         .contentType(ContentType.JSON)
