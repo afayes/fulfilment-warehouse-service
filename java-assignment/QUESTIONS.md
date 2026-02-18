@@ -22,3 +22,32 @@ Here we have 3 questions related to the code base for you to answer. It is not a
 ```txt
 
 ```
+
+----
+### Additional note: Bug fix in `StoreResource.patch()`
+
+While writing tests for the PATCH endpoint, I identified a bug in `StoreResource.patch()` where the partial update conditions were checking the existing entity's fields instead of the incoming request fields. This meant, for example, that a store with zero stock could never have its stock updated via PATCH.
+
+**Before:**
+```java
+if (entity.name != null) {
+    entity.name = updatedStore.name;
+}
+
+if (entity.quantityProductsInStock != 0) {
+    entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
+}
+```
+
+**After:**
+```java
+if (updatedStore.name != null) {
+    entity.name = updatedStore.name;
+}
+
+if (updatedStore.quantityProductsInStock != 0) {
+    entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
+}
+```
+
+The fix checks the incoming request fields, which is the correct semantics for a partial update. Added a corresponding test (`patch_shouldUpdateOnlyName_whenStockIsNotProvided`) to verify the fix.
