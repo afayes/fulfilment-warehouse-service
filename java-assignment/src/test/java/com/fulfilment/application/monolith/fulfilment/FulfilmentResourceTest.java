@@ -65,15 +65,7 @@ class FulfilmentResourceTest {
 
   @Test
   void create_shouldReturn400_whenDuplicateAssociation() {
-    int id =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 2, \"productId\": 1, \"warehouseBusinessUnitCode\": \"MWH.001\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
+    int id = createFulfilment(2, 1, "MWH.001");
 
     given()
         .contentType(ContentType.JSON)
@@ -88,25 +80,8 @@ class FulfilmentResourceTest {
   @Test
   void create_shouldReturn400_whenProductExceedsMaxWarehousesPerStore() {
     // Max 2 warehouses per product per store
-    int id1 =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 3, \"productId\": 2, \"warehouseBusinessUnitCode\": \"MWH.001\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
-
-    int id2 =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 3, \"productId\": 2, \"warehouseBusinessUnitCode\": \"MWH.012\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
+    int id1 = createFulfilment(3, 2, "MWH.001");
+    int id2 = createFulfilment(3, 2, "MWH.012");
 
     given()
         .contentType(ContentType.JSON)
@@ -122,36 +97,9 @@ class FulfilmentResourceTest {
   @Test
   void create_shouldReturn400_whenStoreExceedsMaxWarehouses() {
     // Max 3 distinct warehouses per store — need a 4th warehouse
-    // Use store 1, products 1-3 with warehouses MWH.001, MWH.012, MWH.023
-    int id1 =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 1, \"productId\": 1, \"warehouseBusinessUnitCode\": \"MWH.001\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
-
-    int id2 =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 1, \"productId\": 2, \"warehouseBusinessUnitCode\": \"MWH.012\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
-
-    int id3 =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 1, \"productId\": 3, \"warehouseBusinessUnitCode\": \"MWH.023\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
+    int id1 = createFulfilment(1, 1, "MWH.001");
+    int id2 = createFulfilment(1, 2, "MWH.012");
+    int id3 = createFulfilment(1, 3, "MWH.023");
 
     // Create a 4th warehouse for testing
     String buCode = "FUL." + System.currentTimeMillis();
@@ -176,6 +124,7 @@ class FulfilmentResourceTest {
     deleteFulfilment(id1);
     deleteFulfilment(id2);
     deleteFulfilment(id3);
+    archiveWarehouse(buCode);
   }
 
   @Test
@@ -212,15 +161,7 @@ class FulfilmentResourceTest {
 
   @Test
   void getByStore_shouldReturnFulfilments_whenStoreHasFulfilments() {
-    int id =
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"storeId\": 2, \"productId\": 2, \"warehouseBusinessUnitCode\": \"MWH.023\"}")
-            .post(PATH)
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
+    int id = createFulfilment(2, 2, "MWH.023");
 
     given()
         .when()
@@ -274,6 +215,10 @@ class FulfilmentResourceTest {
         .extract()
         .jsonPath()
         .getLong("id");
+  }
+
+  private void archiveWarehouse(String businessUnitCode) {
+    given().when().delete("/warehouse/" + businessUnitCode).then().statusCode(204);
   }
 
   private void deleteProduct(Long id) {
