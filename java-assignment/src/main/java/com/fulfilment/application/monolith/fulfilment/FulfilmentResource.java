@@ -32,12 +32,7 @@ public class FulfilmentResource {
   @GET
   @Path("store/{storeId}")
   public List<Fulfilment> getByStore(Long storeId) {
-    try {
-      return fulfilmentService.getByStoreId(storeId);
-    } catch (FulfilmentNotFoundException e) {
-      LOGGER.warnf("Store not found for fulfilment lookup: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 404);
-    }
+    return fulfilmentService.getByStoreId(storeId);
   }
 
   @POST
@@ -47,12 +42,7 @@ public class FulfilmentResource {
       throw new WebApplicationException("Id was invalidly set on request", 422);
     }
 
-    try {
-      fulfilmentService.create(fulfilment);
-    } catch (FulfilmentValidationException e) {
-      LOGGER.warnf("Fulfilment creation failed: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 400);
-    }
+    fulfilmentService.create(fulfilment);
 
     LOGGER.infof(
         "Fulfilment created: store=%d, product=%d, warehouse=%s",
@@ -64,12 +54,7 @@ public class FulfilmentResource {
   @Path("{id}")
   @Transactional
   public Response delete(Long id) {
-    try {
-      fulfilmentService.delete(id);
-    } catch (FulfilmentNotFoundException e) {
-      LOGGER.warnf("Fulfilment deletion failed: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 404);
-    }
+    fulfilmentService.delete(id);
     LOGGER.infof("Fulfilment deleted: id=%d", id);
     return Response.status(204).build();
   }

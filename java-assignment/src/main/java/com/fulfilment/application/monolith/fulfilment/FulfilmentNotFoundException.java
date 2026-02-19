@@ -1,6 +1,8 @@
 package com.fulfilment.application.monolith.fulfilment;
 
-public class FulfilmentNotFoundException extends RuntimeException {
+import com.fulfilment.application.monolith.exceptions.DomainNotFoundException;
+
+public class FulfilmentNotFoundException extends DomainNotFoundException {
 
   public FulfilmentNotFoundException(String message) {
     super(message);

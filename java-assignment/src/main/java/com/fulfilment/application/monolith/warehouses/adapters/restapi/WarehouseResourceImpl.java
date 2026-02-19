@@ -1,8 +1,6 @@
 package com.fulfilment.application.monolith.warehouses.adapters.restapi;
 
-import com.fulfilment.application.monolith.location.LocationNotFoundException;
 import com.fulfilment.application.monolith.warehouses.domain.exceptions.WarehouseNotFoundException;
-import com.fulfilment.application.monolith.warehouses.domain.exceptions.WarehouseValidationException;
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.domain.ports.ArchiveWarehouseOperation;
 import com.fulfilment.application.monolith.warehouses.domain.ports.CreateWarehouseOperation;
@@ -40,12 +38,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
   public com.warehouse.api.beans.Warehouse createANewWarehouseUnit(
       @NotNull com.warehouse.api.beans.Warehouse data) {
     var warehouse = toDomainWarehouse(data);
-    try {
-      createWarehouseOperation.create(warehouse);
-    } catch (WarehouseValidationException | LocationNotFoundException e) {
-      LOGGER.warnf("Warehouse creation failed: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 400);
-    }
+    createWarehouseOperation.create(warehouse);
     LOGGER.infof("Warehouse created: %s", warehouse.businessUnitCode);
     return toWarehouseResponse(warehouse);
   }
@@ -60,12 +53,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
   @Transactional
   public void archiveAWarehouseUnitByID(String id) {
     Warehouse warehouse = findWarehouseByIdentifier(id);
-    try {
-      archiveWarehouseOperation.archive(warehouse);
-    } catch (WarehouseNotFoundException e) {
-      LOGGER.warnf("Warehouse archive failed: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 404);
-    }
+    archiveWarehouseOperation.archive(warehouse);
     LOGGER.infof("Warehouse archived: %s", id);
   }
 
@@ -75,15 +63,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
       String businessUnitCode, @NotNull com.warehouse.api.beans.Warehouse data) {
     var newWarehouse = toDomainWarehouse(data);
     newWarehouse.businessUnitCode = businessUnitCode;
-    try {
-      replaceWarehouseOperation.replace(newWarehouse);
-    } catch (WarehouseNotFoundException e) {
-      LOGGER.warnf("Warehouse replacement failed: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 404);
-    } catch (WarehouseValidationException | LocationNotFoundException e) {
-      LOGGER.warnf("Warehouse replacement failed: %s", e.getMessage());
-      throw new WebApplicationException(e.getMessage(), 400);
-    }
+    replaceWarehouseOperation.replace(newWarehouse);
     LOGGER.infof("Warehouse replaced: %s", businessUnitCode);
     return toWarehouseResponse(newWarehouse);
   }
@@ -97,8 +77,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
     }
     Warehouse warehouse = warehouseStore.getById(warehouseId);
     if (warehouse == null) {
-      LOGGER.warnf("Warehouse not found: %s", id);
-      throw new WebApplicationException("Warehouse with identifier '" + id + "' not found", 404);
+      throw new WarehouseNotFoundException(id);
     }
     return warehouse;
   }
