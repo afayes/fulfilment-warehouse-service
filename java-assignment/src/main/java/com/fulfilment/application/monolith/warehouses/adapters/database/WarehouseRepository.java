@@ -5,6 +5,7 @@ import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStor
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
@@ -46,7 +47,12 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
   @Override
   @Transactional
   public void remove(Warehouse warehouse) {
-    delete("businessUnitCode", warehouse.businessUnitCode);
+    DbWarehouse db =
+        find("businessUnitCode = ?1 and archivedAt is null", warehouse.businessUnitCode)
+            .firstResult();
+    if (db != null) {
+      db.archivedAt = LocalDateTime.now();
+    }
   }
 
   @Override
