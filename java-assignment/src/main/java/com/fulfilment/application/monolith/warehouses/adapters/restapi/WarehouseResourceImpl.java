@@ -1,13 +1,13 @@
 package com.fulfilment.application.monolith.warehouses.adapters.restapi;
 
 import com.fulfilment.application.monolith.location.LocationNotFoundException;
-import com.fulfilment.application.monolith.warehouses.adapters.database.WarehouseRepository;
 import com.fulfilment.application.monolith.warehouses.domain.exceptions.WarehouseNotFoundException;
 import com.fulfilment.application.monolith.warehouses.domain.exceptions.WarehouseValidationException;
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.domain.ports.ArchiveWarehouseOperation;
 import com.fulfilment.application.monolith.warehouses.domain.ports.CreateWarehouseOperation;
 import com.fulfilment.application.monolith.warehouses.domain.ports.ReplaceWarehouseOperation;
+import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
 import com.warehouse.api.WarehouseResource;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -22,7 +22,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
 
   private static final Logger LOGGER = Logger.getLogger(WarehouseResourceImpl.class);
 
-  @Inject private WarehouseRepository warehouseRepository;
+  @Inject private WarehouseStore warehouseStore;
 
   @Inject private CreateWarehouseOperation createWarehouseOperation;
 
@@ -32,7 +32,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
 
   @Override
   public List<com.warehouse.api.beans.Warehouse> listAllWarehousesUnits() {
-    return warehouseRepository.getAll().stream().map(this::toWarehouseResponse).toList();
+    return warehouseStore.getAll().stream().map(this::toWarehouseResponse).toList();
   }
 
   @Override
@@ -89,7 +89,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
   }
 
   private Warehouse findWarehouseByIdentifier(String id) {
-    Warehouse warehouse = warehouseRepository.findByBusinessUnitCode(id);
+    Warehouse warehouse = warehouseStore.getById(id);
     if (warehouse == null) {
       LOGGER.warnf("Warehouse not found: %s", id);
       throw new WebApplicationException("Warehouse with identifier '" + id + "' not found", 404);
