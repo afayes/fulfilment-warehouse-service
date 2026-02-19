@@ -26,6 +26,7 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
     db.createdAt = warehouse.createdAt;
     db.archivedAt = warehouse.archivedAt;
     persist(db);
+    warehouse.id = db.id;
   }
 
   @Override
@@ -56,7 +57,11 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
   }
 
   @Override
-  public Warehouse getById(String id) {
-    return findByBusinessUnitCode(id);
+  public Warehouse getById(Long id) {
+    DbWarehouse db = findById(id);
+    if (db == null || db.archivedAt != null) {
+      return null;
+    }
+    return db.toWarehouse();
   }
 }

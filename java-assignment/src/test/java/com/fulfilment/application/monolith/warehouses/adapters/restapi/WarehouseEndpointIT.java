@@ -43,7 +43,7 @@ public class WarehouseEndpointIT {
             containsString("AMSTERDAM-001"),
             containsString("TILBURG-001"));
 
-    given().when().delete(path + "/MWH.001").then().statusCode(204);
+    given().when().delete(path + "/1").then().statusCode(204);
 
     given()
         .when()
@@ -61,19 +61,22 @@ public class WarehouseEndpointIT {
 
     final String path = "warehouse";
 
-    given()
-        .contentType(ContentType.JSON)
-        .body(
-            "{\"businessUnitCode\": \"IT.CREATE\", \"location\": \"AMSTERDAM-002\", \"capacity\": 20, \"stock\": 5}")
-        .post(path)
-        .then()
-        .statusCode(200)
-        .body("businessUnitCode", is("IT.CREATE"))
-        .body("location", is("AMSTERDAM-002"));
+    String warehouseId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(
+                "{\"businessUnitCode\": \"IT.CREATE\", \"location\": \"AMSTERDAM-002\", \"capacity\": 20, \"stock\": 5}")
+            .post(path)
+            .then()
+            .statusCode(200)
+            .body("businessUnitCode", is("IT.CREATE"))
+            .body("location", is("AMSTERDAM-002"))
+            .extract()
+            .path("id");
 
     given()
         .when()
-        .get(path + "/IT.CREATE")
+        .get(path + "/" + warehouseId)
         .then()
         .statusCode(200)
         .body("businessUnitCode", is("IT.CREATE"))
@@ -94,20 +97,23 @@ public class WarehouseEndpointIT {
         .then()
         .statusCode(200);
 
-    given()
-        .contentType(ContentType.JSON)
-        .body(
-            "{\"businessUnitCode\": \"IT.REPLACE\", \"location\": \"EINDHOVEN-001\", \"capacity\": 30, \"stock\": 5}")
-        .post(path + "/IT.REPLACE/replacement")
-        .then()
-        .statusCode(200)
-        .body("businessUnitCode", is("IT.REPLACE"))
-        .body("location", is("EINDHOVEN-001"))
-        .body("capacity", is(30));
+    String newWarehouseId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(
+                "{\"businessUnitCode\": \"IT.REPLACE\", \"location\": \"EINDHOVEN-001\", \"capacity\": 30, \"stock\": 5}")
+            .post(path + "/IT.REPLACE/replacement")
+            .then()
+            .statusCode(200)
+            .body("businessUnitCode", is("IT.REPLACE"))
+            .body("location", is("EINDHOVEN-001"))
+            .body("capacity", is(30))
+            .extract()
+            .path("id");
 
     given()
         .when()
-        .get(path + "/IT.REPLACE")
+        .get(path + "/" + newWarehouseId)
         .then()
         .statusCode(200)
         .body("location", is("EINDHOVEN-001"))

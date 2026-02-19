@@ -89,7 +89,13 @@ public class WarehouseResourceImpl implements WarehouseResource {
   }
 
   private Warehouse findWarehouseByIdentifier(String id) {
-    Warehouse warehouse = warehouseStore.getById(id);
+    Long warehouseId;
+    try {
+      warehouseId = Long.parseLong(id);
+    } catch (NumberFormatException e) {
+      throw new WebApplicationException("Invalid warehouse id: " + id, 400);
+    }
+    Warehouse warehouse = warehouseStore.getById(warehouseId);
     if (warehouse == null) {
       LOGGER.warnf("Warehouse not found: %s", id);
       throw new WebApplicationException("Warehouse with identifier '" + id + "' not found", 404);
@@ -108,6 +114,9 @@ public class WarehouseResourceImpl implements WarehouseResource {
 
   private com.warehouse.api.beans.Warehouse toWarehouseResponse(Warehouse warehouse) {
     var response = new com.warehouse.api.beans.Warehouse();
+    if (warehouse.id != null) {
+      response.setId(String.valueOf(warehouse.id));
+    }
     response.setBusinessUnitCode(warehouse.businessUnitCode);
     response.setLocation(warehouse.location);
     response.setCapacity(warehouse.capacity);

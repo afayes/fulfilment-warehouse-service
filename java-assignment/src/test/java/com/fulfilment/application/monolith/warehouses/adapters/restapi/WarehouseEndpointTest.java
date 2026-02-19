@@ -26,22 +26,23 @@ class WarehouseEndpointTest {
         .body("businessUnitCode", hasItems("MWH.001", "MWH.012", "MWH.023"));
   }
 
-  // --- GET by businessUnitCode ---
+  // --- GET by id ---
 
   @Test
   void getById_shouldReturnWarehouse_whenWarehouseExists() {
     given()
         .when()
-        .get(PATH + "/MWH.001")
+        .get(PATH + "/1")
         .then()
         .statusCode(200)
+        .body("id", is("1"))
         .body("businessUnitCode", is("MWH.001"))
         .body("location", is("ZWOLLE-001"));
   }
 
   @Test
   void getById_shouldReturn404_whenWarehouseDoesNotExist() {
-    given().when().get(PATH + "/NON-EXISTENT").then().statusCode(404);
+    given().when().get(PATH + "/99999").then().statusCode(404);
   }
 
   // --- POST create ---
@@ -124,24 +125,27 @@ class WarehouseEndpointTest {
   @Test
   void archive_shouldReturn204AndRemoveFromList_whenWarehouseExists() {
     String buCode = "ARCH." + System.currentTimeMillis();
-    given()
-        .contentType(ContentType.JSON)
-        .body(
-            "{\"businessUnitCode\": \""
-                + buCode
-                + "\", \"location\": \"VETSBY-001\", \"capacity\": 20, \"stock\": 5}")
-        .post(PATH)
-        .then()
-        .statusCode(200);
+    String warehouseId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(
+                "{\"businessUnitCode\": \""
+                    + buCode
+                    + "\", \"location\": \"VETSBY-001\", \"capacity\": 20, \"stock\": 5}")
+            .post(PATH)
+            .then()
+            .statusCode(200)
+            .extract()
+            .path("id");
 
-    given().when().delete(PATH + "/" + buCode).then().statusCode(204);
+    given().when().delete(PATH + "/" + warehouseId).then().statusCode(204);
 
-    given().when().get(PATH + "/" + buCode).then().statusCode(404);
+    given().when().get(PATH + "/" + warehouseId).then().statusCode(404);
   }
 
   @Test
   void archive_shouldReturn404_whenWarehouseDoesNotExist() {
-    given().when().delete(PATH + "/NON-EXISTENT").then().statusCode(404);
+    given().when().delete(PATH + "/99999").then().statusCode(404);
   }
 
   // --- POST replacement ---

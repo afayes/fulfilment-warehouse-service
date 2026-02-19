@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
@@ -218,7 +220,15 @@ class FulfilmentResourceTest {
   }
 
   private void archiveWarehouse(String businessUnitCode) {
-    given().when().delete("/warehouse/" + businessUnitCode).then().statusCode(204);
+    List<Map<String, Object>> warehouses =
+        given().when().get("/warehouse").then().statusCode(200).extract().jsonPath().getList("$");
+    String warehouseId =
+        warehouses.stream()
+            .filter(w -> businessUnitCode.equals(w.get("businessUnitCode")))
+            .map(w -> String.valueOf(w.get("id")))
+            .findFirst()
+            .orElseThrow();
+    given().when().delete("/warehouse/" + warehouseId).then().statusCode(204);
   }
 
   private void deleteProduct(Long id) {

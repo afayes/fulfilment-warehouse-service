@@ -15,5 +15,5 @@ public interface WarehouseStore {
 
   Warehouse findByBusinessUnitCode(String buCode);
 
-  Warehouse getById(String id);
+  Warehouse getById(Long id);
 }
